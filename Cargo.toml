@@ -1,0 +1,19 @@
+[package]
+name = "my_wasm_png"
+version = "0.1.0"
+authors = ["Romāns Potašovs <justgook@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+png = "0.16.7"
+wasm-bindgen = "0.2.68"
+base64 = "0.12.3"
+
+[lib]
+crate-type = ["cdylib"]
+
+
+[profile.release]
+lto = true
+#wasm-opt - Finally, as one last caveat, wasm-opt is automatically disabled if wasm-bindgen is used as part of the build.
+opt-level = 's'

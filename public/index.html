@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>wasm wasm wasm</title>
+    <style>
+        img {
+            image-rendering: pixelated;
+        }
+    </style>
+    <script>
+        function binaryToBase64(arrayBuffer) {
+            return btoa(String.fromCharCode.apply(null, new Uint8Array(arrayBuffer)));
+        }
+
+        function base64ToBinary(base64) {
+            const raw = atob(base64);
+            const rawLength = raw.length;
+            const array = new Uint8Array(new ArrayBuffer(rawLength));
+            for (let i = 0; i < rawLength; i++) {
+                array[i] = raw.charCodeAt(i);
+            }
+            return array.buffer;
+        }
+    </script>
+    <script type="module">
+        import * as fromWASM from "./my_wasm_png.js"
+
+        const w = 100;
+        const h = 100;
+        let data2 = new Uint32Array(w * h);
+        data2.fill(0xFF000000);
+        data2.forEach((v, i) => data2[i] = Math.random() * 0xFFFFFF + 0xFF000000);
+
+        fromWASM.default().then((wasm) => {
+            const data = new Uint8Array(new Uint32Array(data2).buffer);
+            console.time("imageData");
+            const imageData = fromWASM.doPng(w, h, data);
+            console.timeEnd("imageData");
+            console.time("imageDataConvert");
+            document.getElementById("img").src = `data:image/png;base64,${binaryToBase64(imageData)}`
+            console.timeEnd("imageDataConvert");
+        });
+    </script>
+</head>
+<body style="white-space: pre-wrap;">
+<img
+        id="img"
+        width="100"
+        height="100"
+>
+
+</body>
+</html>
