@@ -1,14 +1,11 @@
 ###  To compile:
 
+```
 cargo build --target wasm32-unknown-unknown --release && wasm-bindgen target/wasm32-unknown-unknown/release/my_wasm_png.wasm --out-dir ./public --target web
-
-### Based on:
-
-https://dev.to/dandyvica/wasm-in-rust-without-nodejs-2e0c
-
-https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Table
-
-https://dev.to/jor/rust-wasm-browser-nodejs-2bo6
+```
+```
+cargo build --target wasm32-unknown-unknown --release && wasm-bindgen target/wasm32-unknown-unknown/release/my_wasm_png.wasm --out-dir ./cli --target nodejs
+```
 
 ### Usage
 
@@ -23,6 +20,5 @@ export const ready = fetch('my_wasm_png.wasm').then(response => {
         })
     })
 });
-
 ```
 

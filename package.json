@@ -1,0 +1,26 @@
+{
+  "name": "@justgook/age-pack",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:justgook/age-pack.git",
+  "author": "Romāns Potašovs <justgook@gmail.com>",
+  "license": "MIT",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
+  "bin": {
+    "age-pack": "bin/index.js"
+  },
+  "keywords": [
+    "wasm",
+    "png",
+    "image",
+    "package"
+  ],
+  "dependencies": {
+    "yargs": "16.1.0"
+  },
+  "devDependencies": {
+    "@types/yargs": "15.0.9"
+  }
+}

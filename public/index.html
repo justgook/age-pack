@@ -2,10 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>wasm wasm wasm</title>
+    <title>WASM PNG</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0
+        }
+
         img {
             image-rendering: pixelated;
+        }
+
+        .container img {
+            float: left;
         }
     </style>
     <script>
@@ -24,31 +33,80 @@
         }
     </script>
     <script type="module">
-        import * as fromWASM from "./my_wasm_png.js"
+        import * as wasmPNG from "./my_wasm_png.js"
 
-        const w = 100;
-        const h = 100;
+        const w = 8;
+        const h = 9;
+
+        const sliceW = 2
+        const sliceH = 3
         let data2 = new Uint32Array(w * h);
         data2.fill(0xFF000000);
         data2.forEach((v, i) => data2[i] = Math.random() * 0xFFFFFF + 0xFF000000);
 
-        fromWASM.default().then((wasm) => {
+        wasmPNG.default().then(async (wasm) => {
+            /// Encoding
             const data = new Uint8Array(new Uint32Array(data2).buffer);
-            console.time("imageData");
-            const imageData = fromWASM.doPng(w, h, data);
-            console.timeEnd("imageData");
-            console.time("imageDataConvert");
+            console.time("encodePNG");
+            const imageData = wasmPNG.encodePNG(w, h, data);
+            console.timeEnd("encodePNG");
+            console.time("binaryToBase64");
             document.getElementById("img").src = `data:image/png;base64,${binaryToBase64(imageData)}`
-            console.timeEnd("imageDataConvert");
+            console.timeEnd("binaryToBase64");
+
+
+            // Slicing
+            const slicedImage = wasmPNG.slicePngData(imageData, sliceW, sliceH);
+            const slicedImageCount = slicedImage.count()
+            for (let i = 0; i < slicedImageCount; i++) {
+                const sliceImageData = slicedImage.image(i)
+                const img = document.createElement("img");
+                img.width = sliceW * 10
+                img.height = sliceH * 10
+                img.src = `data:image/png;base64,${binaryToBase64(sliceImageData)}`
+                document.body.appendChild(img)
+            }
+            slicedImage.free()
+            // Slicing 2
+            //*
+            const bigImg = await fetch("/big.png")
+            const bigImgData = await bigImg.arrayBuffer()
+            console.time("bigImgData")
+            const bigSlicedImg = wasmPNG.slicePngFast(new Uint8Array(bigImgData), 128, 128);
+            console.timeEnd("bigImgData")
+            const bigSlicedImgCount = bigSlicedImg.count()
+            console.time("bigImgData::encoding")
+            const container = document.createElement("div")
+            for (let i = 0; i < bigSlicedImgCount; i++) {
+                const sliceImageData = bigSlicedImg.image(i)
+                const img = document.createElement("img");
+                img.width = 10
+                img.height = 10
+                img.src = `data:image/png;base64,${binaryToBase64(sliceImageData)}`
+                container.appendChild(img)
+            }
+            container.className = "container"
+            container.style.width = `${bigSlicedImg.cols() * 10}px`;
+            container.style.height = `${bigSlicedImg.rows() * 10}px`;
+            document.body.appendChild(container)
+            console.timeEnd("bigImgData::encoding")
+            bigSlicedImg.free()
+            //*/
+
+            // Decoding
+            console.time("decoderPNG")
+            const decodedImage = wasmPNG.decoderPNG(imageData);
+            console.timeEnd("decoderPNG")
+            console.log(decodedImage.width(), decodedImage.height(), new Uint32Array(decodedImage.data().buffer)[0].toString(16))
+            decodedImage.free();
         });
     </script>
 </head>
-<body style="white-space: pre-wrap;">
+<body>
 <img
         id="img"
-        width="100"
-        height="100"
+        width="80"
+        height="90"
 >
-
 </body>
 </html>

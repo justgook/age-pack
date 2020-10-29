@@ -9,10 +9,6 @@ logs
 node_modules/
 elm-stuff/
 
-# Develop
-examples/index.html
-examples/bundle.js
-
 # Yarn Integrity file
 .yarn-integrity
 
@@ -28,4 +24,7 @@ tests/VerifyExamples
 
 
 #Deployment
+/cli/
+/data/
 public/*
+!public/index.html
