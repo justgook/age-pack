@@ -1,3 +1,5 @@
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fjustgook%2Fage-pack.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fjustgook%2Fage-pack?ref=badge_shield)
+
 ###  To compile:
 
 ```
@@ -22,3 +24,7 @@ export const ready = fetch('my_wasm_png.wasm').then(response => {
 });
 ```
 
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fjustgook%2Fage-pack.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fjustgook%2Fage-pack?ref=badge_large)
