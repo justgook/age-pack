@@ -2,25 +2,62 @@ use wasm_bindgen::prelude::*;
 use std::collections::HashMap;
 
 
-#[wasm_bindgen]
-extern "C" {
-    #[wasm_bindgen(js_namespace = console)]
-    fn log(s: &str);
-
-    #[wasm_bindgen(js_namespace = console, js_name = log)]
-    fn log_u32(a: u32);
-
-    #[wasm_bindgen(js_namespace = console, js_name = log)]
-    fn log_many(a: &str, b: &str);
-}
-
-macro_rules! console_log {
-    ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
-}
+// #[wasm_bindgen]
+// extern "C" {
+//     #[wasm_bindgen(js_namespace = console)]
+//     fn log(s: &str);
+//
+//     #[wasm_bindgen(js_namespace = console, js_name = log)]
+//     fn log_u32(a: u32);
+//
+//     #[wasm_bindgen(js_namespace = console, js_name = log)]
+//     fn log_many(a: &str, b: &str);
+// }
+//
+// macro_rules! console_log {
+//     ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
+// }
 
 // DEBUG END!!
 
-#[wasm_bindgen(js_name = encodePNG)]
+// EXTERN MAGIC START
+// #[wasm_bindgen(module = "/src/defined-in-js.js")]
+// extern "C" {
+//     fn name() -> String;
+//
+//     type MyClass;
+//
+//     #[wasm_bindgen(constructor)]
+//     fn new() -> MyClass;
+//
+//     #[wasm_bindgen(method, getter)]
+//     fn number(this: &MyClass) -> u32;
+//     #[wasm_bindgen(method, setter)]
+//     fn set_number(this: &MyClass, number: u32) -> MyClass;
+//     #[wasm_bindgen(method)]
+//     fn render(this: &MyClass) -> String;
+// }
+//
+// #[wasm_bindgen]
+// extern "C" {
+//     #[wasm_bindgen(js_namespace = console)]
+//     fn log(s: &str);
+// }
+//
+//
+// #[wasm_bindgen(start)]
+// pub fn run() {
+//     log(&format!("Hello from {}!", name())); // should output "Hello from Rust!"
+//
+//     let x = MyClass::new();
+//     assert_eq!(x.number(), 42);
+//     x.set_number(10);
+//     log(&x.render());
+// }
+// EXTERN MAGIC END
+
+
+#[wasm_bindgen(js_name = encodePng)]
 pub fn encode_png(width: u32, height: u32, data: Vec<u8>) -> Vec<u8> {
     let mut out = Vec::new();
     let mut encoder = png::Encoder::new(&mut out, width, height);
@@ -51,8 +88,8 @@ impl ImageData {
 }
 
 
-#[wasm_bindgen(js_name = decoderPNG)]
-pub fn decoder_png(image: Vec<u8>) -> ImageData {
+#[wasm_bindgen(js_name = decodePng)]
+pub fn decode_png(image: Vec<u8>) -> ImageData {
     let decoder = png::Decoder::new(image.as_slice());
     let (info, mut reader) = decoder.read_info().unwrap();
     let mut buf = vec![0; info.buffer_size()];
@@ -60,6 +97,26 @@ pub fn decoder_png(image: Vec<u8>) -> ImageData {
     // drop(reader);
 
     ImageData { width: info.width, height: info.height, data: buf }
+}
+
+#[wasm_bindgen(js_name = decodePngInfo)]
+pub fn png_dimensions(image: Vec<u8>) -> Dimensions {
+    let decoder = png::Decoder::new(image.as_slice());
+    let (info, _) = decoder.read_info().unwrap();
+    // drop(reader);
+    Dimensions { width: info.width, height: info.height }
+}
+
+#[wasm_bindgen]
+pub struct Dimensions {
+    width: u32,
+    height: u32,
+}
+
+#[wasm_bindgen]
+impl Dimensions {
+    pub fn width(&self) -> u32 { self.width }
+    pub fn height(&self) -> u32 { self.height }
 }
 
 // Slicing
@@ -165,7 +222,7 @@ pub fn unique_images(images: Vec<Vec<u8>>) -> UniqueImages {
 
 #[wasm_bindgen(js_name = slicePngData)]
 pub fn slice_png_data(image: Vec<u8>, w: usize, h: usize) -> ImagesOptimized {
-    let decoded_image = decoder_png(image);
+    let decoded_image = decode_png(image);
     let image_width = decoded_image.width as usize;
     let image_height = decoded_image.height as usize;
     let image_data = decoded_image.data;
@@ -187,7 +244,7 @@ pub fn slice_png_data(image: Vec<u8>, w: usize, h: usize) -> ImagesOptimized {
 
 #[wasm_bindgen(js_name = slicePngFast)]
 pub fn slice_png_data_fast(image: Vec<u8>, w: usize, h: usize) -> ImagesFast {
-    let decoded_image = decoder_png(image);
+    let decoded_image = decode_png(image);
     let image_width = decoded_image.width as usize;
     let image_height = decoded_image.height as usize;
     let image_data = decoded_image.data;

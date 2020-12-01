@@ -6,7 +6,7 @@
     <style>
         * {
             margin: 0;
-            padding: 0
+            padding: 0;
         }
 
         img {
@@ -19,48 +19,77 @@
     </style>
     <script>
         function binaryToBase64(arrayBuffer) {
-            return btoa(String.fromCharCode.apply(null, new Uint8Array(arrayBuffer)));
+            return btoa(String.fromCharCode.apply(null, new Uint8Array(arrayBuffer)))
         }
 
         function base64ToBinary(base64) {
-            const raw = atob(base64);
-            const rawLength = raw.length;
-            const array = new Uint8Array(new ArrayBuffer(rawLength));
+            const raw = atob(base64)
+            const rawLength = raw.length
+            const array = new Uint8Array(new ArrayBuffer(rawLength))
             for (let i = 0; i < rawLength; i++) {
-                array[i] = raw.charCodeAt(i);
+                array[i] = raw.charCodeAt(i)
             }
-            return array.buffer;
+            return array.buffer
         }
     </script>
     <script type="module">
         import * as wasmPNG from "./my_wasm_png.js"
 
-        const w = 8;
-        const h = 9;
+        const w = 8
+        const h = 9
 
         const sliceW = 2
         const sliceH = 3
-        let data2 = new Uint32Array(w * h);
-        data2.fill(0xFF000000);
-        data2.forEach((v, i) => data2[i] = Math.random() * 0xFFFFFF + 0xFF000000);
+        let data2 = new Uint32Array(w * h)
+        data2.fill(0xFF000000)
+        data2.forEach((v, i) => data2[i] = Math.random() * 0xFFFFFF + 0xFF000000)
 
         wasmPNG.default().then(async (wasm) => {
+            DataView.prototype.getUint24 = function (pos) {
+                return (this.getUint16(pos) << 8) + this.getUint8(pos + 2);
+            }
+
+            //DELME START
+            fetch("/art/tiled/automap/tilemap/journey-1x.png")
+                .then(response => response.arrayBuffer())
+                .then((buffer) => {
+                    function toDataArray(buffer, mapping = (a) => a) {
+                        const dataView = new DataView(buffer)
+                        const size = buffer.byteLength;
+                        const result = []
+                        for (let i = 0; i < size; i += 3) {
+                            result.push(mapping(dataView.getUint24(i, false)))
+                        }
+                        return result
+                    }
+
+                    const aaa = wasmPNG.decodePng(new Uint8Array(buffer))
+                    const result = toDataArray(aaa.data().buffer)
+                        .map((value, i) => {
+                            return `0x${value.toString(16)}FF: ${i + 1}`
+                        })
+                    console.log(result.join("\n"));
+                })
+
+
+            //DELME END
+            console.log(wasmPNG)
             /// Encoding
-            const data = new Uint8Array(new Uint32Array(data2).buffer);
-            console.time("encodePNG");
-            const imageData = wasmPNG.encodePNG(w, h, data);
-            console.timeEnd("encodePNG");
-            console.time("binaryToBase64");
+            const data = new Uint8Array(new Uint32Array(data2).buffer)
+            console.time("encodePNG")
+            const imageData = wasmPNG.encodePng(w, h, data)
+            console.timeEnd("encodePNG")
+            console.time("binaryToBase64")
             document.getElementById("img").src = `data:image/png;base64,${binaryToBase64(imageData)}`
-            console.timeEnd("binaryToBase64");
+            console.timeEnd("binaryToBase64")
 
 
             // Slicing
-            const slicedImage = wasmPNG.slicePngData(imageData, sliceW, sliceH);
+            const slicedImage = wasmPNG.slicePngData(imageData, sliceW, sliceH)
             const slicedImageCount = slicedImage.count()
             for (let i = 0; i < slicedImageCount; i++) {
                 const sliceImageData = slicedImage.image(i)
-                const img = document.createElement("img");
+                const img = document.createElement("img")
                 img.width = sliceW * 10
                 img.height = sliceH * 10
                 img.src = `data:image/png;base64,${binaryToBase64(sliceImageData)}`
@@ -68,38 +97,39 @@
             }
             slicedImage.free()
             // Slicing 2
-            //*
-            const bigImg = await fetch("/big.png")
+            /*
+            const bigImg = await fetch("/art/map/002.png")
             const bigImgData = await bigImg.arrayBuffer()
             console.time("bigImgData")
-            const bigSlicedImg = wasmPNG.slicePngFast(new Uint8Array(bigImgData), 128, 128);
+            const bigSlicedImg = wasmPNG.slicePngFast(new Uint8Array(bigImgData), 128, 128)
             console.timeEnd("bigImgData")
             const bigSlicedImgCount = bigSlicedImg.count()
             console.time("bigImgData::encoding")
             const container = document.createElement("div")
             for (let i = 0; i < bigSlicedImgCount; i++) {
                 const sliceImageData = bigSlicedImg.image(i)
-                const img = document.createElement("img");
+                const img = document.createElement("img")
                 img.width = 10
                 img.height = 10
                 img.src = `data:image/png;base64,${binaryToBase64(sliceImageData)}`
                 container.appendChild(img)
             }
             container.className = "container"
-            container.style.width = `${bigSlicedImg.cols() * 10}px`;
-            container.style.height = `${bigSlicedImg.rows() * 10}px`;
+            container.style.width = `${bigSlicedImg.cols() * 10}px`
+            container.style.height = `${bigSlicedImg.rows() * 10}px`
             document.body.appendChild(container)
             console.timeEnd("bigImgData::encoding")
             bigSlicedImg.free()
             //*/
 
+
             // Decoding
             console.time("decoderPNG")
-            const decodedImage = wasmPNG.decoderPNG(imageData);
+            const decodedImage = wasmPNG.decodePng(imageData)
             console.timeEnd("decoderPNG")
             console.log(decodedImage.width(), decodedImage.height(), new Uint32Array(decodedImage.data().buffer)[0].toString(16))
-            decodedImage.free();
-        });
+            decodedImage.free()
+        })
     </script>
 </head>
 <body>

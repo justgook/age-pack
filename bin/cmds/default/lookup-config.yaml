@@ -1,0 +1,7 @@
+ignore-layers:
+  - "type"
+  - "blob_*"
+#  - "001"
+replace:
+  "*": {1: 0x0000FFFF}
+  "001": {15: 0x00FF00FF}

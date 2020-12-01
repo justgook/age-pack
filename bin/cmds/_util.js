@@ -1,14 +1,36 @@
 const path = require("path")
 const fs = require("fs")
+const yaml = require("js-yaml")
 
-function toArray(buffer) {
-    const dataView = new DataView(buffer)
-    const size = buffer.byteLength;
-    const result = []
-    for (let i = 0; i < size; i += 4) {
-        result.push(dataView.getUint32(i, false))
+exports.configOption = {
+    type: "string",
+    description: "Path to config file",
+    normalize: true,
+    coerce: (filename) => {
+        const configFilename = fixFilePath(filename)
+        if (!fileExists(configFilename)) {
+            throw new Error(`Argument check failed: "${nicePath(configFilename)}" is not a readable file`);
+        }
+        try {
+            let fileContents = fs.readFileSync(configFilename, "utf8");
+            return yaml.safeLoad(fileContents);
+        } catch (e) {
+            throw new Error(`Argument check failed: failed to parse "${nicePath(configFilename)}"\n${e}`);
+        }
+    },
+}
+
+
+function allPromise(proms, progress_cb = () => null) {
+    let d = 0;
+    progress_cb(0);
+    for (const p of proms) {
+        p.then(() => {
+            d++;
+            progress_cb(d / proms.length);
+        });
     }
-    return result
+    return Promise.all(proms);
 }
 
 
@@ -58,4 +80,4 @@ exports.fixFilePath = fixFilePath;
 exports.nicePath = nicePath;
 exports.canReadAndWriteRecursive = canReadAndWriteRecursive;
 exports.fileExists = fileExists;
-exports.toArray = toArray;
+exports.allPromise = allPromise;

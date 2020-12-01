@@ -1,0 +1,82 @@
+rename:
+#  "big2": "desert"
+#  "big": "type"
+#  "001": "type"
+#  "002": "help-layer"
+  "dev": type
+
+tileset:
+  - { firstgid: 1, source: "..\/..\/..\/..\/pandemic\/art\/tiled\/automap\/tilemap\/journey.json" }
+  - { firstgid: 129, source: "..\/..\/..\/..\/pandemic\/art\/tiled\/automap\/tilemap\/output.json" }
+
+
+
+replace:
+#  "*": { 0x000000FF: 20, 0xFF0000FF: 20}
+#  "help-layer": {0xd95763FF: 30}
+#  "main-layer": {15: 0x00FF00FF}
+  "type":
+    0x50914FF: 1
+    0x110524FF: 2
+    0x3b063aFF: 3
+    0x691749FF: 4
+    0x9c3247FF: 5
+    0xd46453FF: 6
+    0xf5a15dFF: 7
+    0xffcf8eFF: 8
+    0xff7a7dFF: 9
+    0xff417dFF: 10
+    0xd61a88FF: 11
+    0x94007aFF: 12
+    0x42004eFF: 13
+    0x220029FF: 14
+    0x100726FF: 15
+    0x25082cFF: 16
+    0x3d1132FF: 17
+    0x73263dFF: 18
+    0xbd4035FF: 19
+    0xed7b39FF: 20
+    0xffb84aFF: 21
+    0xfff540FF: 22
+    0xc6d831FF: 23
+    0x77b02aFF: 24
+    0x429058FF: 25
+    0x2c645eFF: 26
+    0x153c4aFF: 27
+    0x52137FF: 28
+    0xe0421FF: 29
+    0xc0b42FF: 30
+    0x32769FF: 31
+    0x144491FF: 32
+    0x488bd4FF: 33
+    0x78d7ffFF: 34
+    0xb0fff1FF: 35
+    0xfaffffFF: 36
+    0xc7d4e1FF: 37
+    0x928fb8FF: 38
+    0x5b537dFF: 39
+    0x392946FF: 40
+    0x24142cFF: 41
+    0xe0f2cFF: 42
+    0x132243FF: 43
+    0x1a466bFF: 44
+    0x10908eFF: 45
+    0x28c074FF: 46
+    0x3dff6eFF: 47
+    0xf8ffb8FF: 48
+    0xf0c297FF: 49
+    0xcf968cFF: 50
+    0x8f5765FF: 51
+    0x52294bFF: 52
+    0xf022eFF: 53
+    0x35003bFF: 54
+    0x64004cFF: 55
+    0x9b0e3eFF: 56
+    0xd41e3cFF: 57
+    0xed4c40FF: 58
+    0xff9757FF: 59
+    0xd4662fFF: 60
+    0x9c341aFF: 61
+    0x691b22FF: 62
+    0x450c28FF: 63
+    0x2d002eFF: 64

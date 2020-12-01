@@ -18,9 +18,13 @@
     "package"
   ],
   "dependencies": {
+    "js-yaml": "3.14.0",
+    "minimatch": "3.0.4",
+    "terminal-kit": "1.44.0",
     "yargs": "16.1.0"
   },
   "devDependencies": {
+    "@types/terminal-kit": "1.28.2",
     "@types/yargs": "15.0.9"
   }
 }
